@@ -1,61 +1,62 @@
 # Meet Captions Collector
 
-Локальное Chrome-расширение (Manifest V3): читает встроенные субтитры Google
-Meet прямо из DOM, копит транскрипт локально в IndexedDB и по кнопке отдаёт его
-в выбранную LLM (Claude / ChatGPT) для summary, action items и follow-up.
+A local Chrome extension (Manifest V3): it reads Google Meet's built-in captions
+straight from the DOM, accumulates the transcript locally in IndexedDB, and — on
+a button press — hands it off to the LLM of your choice (Claude / ChatGPT) for a
+summary, action items and follow-ups.
 
-Аудио не обрабатывается и никуда не отправляется — используется распознавание
-речи, которое Google Meet уже делает.
+Audio is never processed or sent anywhere — it relies on the speech recognition
+Google Meet already performs.
 
-## Установка (без сборки)
+## Install (no build step)
 
-1. `python3 make_icons.py` — сгенерировать иконки (один раз).
-2. Chrome → `chrome://extensions` → включить **Developer mode**.
-3. **Load unpacked** → выбрать папку `transcribe`.
+1. `python3 make_icons.py` — generate the icons (once).
+2. Chrome → `chrome://extensions` → enable **Developer mode**.
+3. **Load unpacked** → select the `transcribe` folder.
 
-## Использование
+## Usage
 
-1. Зайти в Google Meet и **включить субтитры** (кнопка CC). Без включённых
-   субтитров собирать нечего.
-2. Кликнуть иконку расширения на панели — откроется боковая панель с живым
-   транскриптом, поиском и кнопками.
-3. После встречи:
-   - **Копировать MD / Скачать .md** — транскрипт в Markdown.
-   - **→ Claude / → ChatGPT** — промпт + транскрипт копируются в буфер обмена и
-     открывается новая вкладка. Вставить `Ctrl+V` и отправить.
+1. Join a Google Meet and **turn captions on** (the CC button). Without captions
+   enabled there is nothing to collect.
+2. Click the extension icon in the toolbar — a side panel opens with the live
+   transcript, search and buttons.
+3. After the meeting:
+   - **Copy MD / Download .md** — the transcript as Markdown.
+   - **→ Claude / → ChatGPT** — the prompt + transcript are copied to the
+     clipboard and a new tab opens. Paste with `Ctrl+V` and send.
 
-## Как это работает
+## How it works
 
 ```
-Google Meet (CC вкл.)
-   │  content.js  — MutationObserver на div[role="region"][aria-label="Captions"]
+Google Meet (CC on)
+   │  content.js  — MutationObserver on div[role="region"][aria-label="Captions"]
    ▼
-background.js  — сохраняет строки в IndexedDB (origin расширения)
+background.js  — saves lines to IndexedDB (extension origin)
    ▼
-sidepanel.js   — живой транскрипт, поиск, экспорт, web-handoff в LLM
+sidepanel.js   — live transcript, search, export, web hand-off to the LLM
 ```
 
-Дедупликация: субтитры Meet дописываются в тот же блок по мере речи. Каждый блок
-отслеживается по DOM-узлу и записывается как одна строка, обновляемая до
-финального текста (см. `isSameLine` в `src/content.js`).
+Deduplication: Meet appends to the same caption block as someone keeps speaking.
+Each block is tracked by its DOM node and recorded as a single line, updated up
+to its final text (see `isSameLine` in `src/content.js`).
 
-## Ограничения
+## Limitations
 
-- Селекторы субтитров у Google обфусцированы. Привязка идёт к стабильному
-  `role="region"` + `aria-label` (EN/RU), с запасным путём по структуре
-  «блок = родитель заголовка с аватаром». При редизайне Meet может потребоваться
-  правка `getEntries()` / `REGION_LABEL_RE` в `src/content.js`.
-- Качество текста = качество распознавания Google Meet.
-- Субтитры должны быть включены вручную.
+- Google's caption selectors are obfuscated. Binding relies on the stable
+  `role="region"` + `aria-label` (EN/RU), with a fallback path based on the
+  "block = parent of the header with the avatar" structure. A Meet redesign may
+  require fixing `getEntries()` / `REGION_LABEL_RE` in `src/content.js`.
+- Text quality = the quality of Google Meet's recognition.
+- Captions must be enabled manually.
 
-## Файлы
+## Files
 
-| Файл | Назначение |
+| File | Purpose |
 |------|------------|
-| `manifest.json` | манифест MV3 |
-| `src/content.js` | чтение субтитров из DOM |
-| `src/background.js` | сохранение в IndexedDB + рассылка в панель |
-| `src/idb.js` | обёртка над IndexedDB |
-| `src/sidepanel.*` | UI боковой панели |
-| `src/prompt.js` | промпт для LLM |
-| `make_icons.py` | генератор иконок |
+| `manifest.json` | MV3 manifest |
+| `src/content.js` | reads captions from the DOM |
+| `src/background.js` | saves to IndexedDB + broadcasts to the panel |
+| `src/idb.js` | IndexedDB wrapper |
+| `src/sidepanel.*` | side panel UI |
+| `src/prompt.js` | the LLM prompt |
+| `make_icons.py` | icon generator |

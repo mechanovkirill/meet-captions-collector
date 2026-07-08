@@ -79,8 +79,8 @@ async function copyText(text) {
 async function handoff(url) {
   const ok = await copyText(buildPrompt(currentTitle(), lines));
   toast(ok
-    ? 'Промпт + транскрипт скопированы. Вставьте (Ctrl+V) в открывшейся вкладке.'
-    : 'Не удалось скопировать в буфер обмена.');
+    ? 'Prompt + transcript copied. Paste (Ctrl+V) in the tab that opened.'
+    : 'Could not copy to the clipboard.');
   chrome.tabs.create({ url });
 }
 
@@ -111,7 +111,7 @@ $('search').addEventListener('input', render);
 $('refresh').addEventListener('click', refreshMeetings);
 $('copy').addEventListener('click', async () => {
   const ok = await copyText(transcriptMarkdown(currentTitle()));
-  toast(ok ? 'Транскрипт скопирован (Markdown).' : 'Не удалось скопировать.');
+  toast(ok ? 'Transcript copied (Markdown).' : 'Could not copy.');
 });
 $('download').addEventListener('click', () => {
   const name = currentTitle().replace(/[^\w.-]+/g, '_') || 'meeting';
@@ -121,7 +121,7 @@ $('claude').addEventListener('click', () => handoff('https://claude.ai/new'));
 $('chatgpt').addEventListener('click', () => handoff('https://chatgpt.com/'));
 $('clear').addEventListener('click', async () => {
   if (!selectedMeeting) return;
-  if (!confirm('Удалить сохранённый транскрипт этой встречи?')) return;
+  if (!confirm('Delete the saved transcript for this meeting?')) return;
   await clearMeeting(selectedMeeting);
   selectedMeeting = null;
   await refreshMeetings();

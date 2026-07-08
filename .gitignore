@@ -1,0 +1,11 @@
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Local dev artifacts (contain real meeting captions — never commit)
+google-meet-sample*.html
+
+# Node
+node_modules/
+*.log

@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="sidepanel.css" />
+    <title>Meet Captions</title>
+  </head>
+  <body>
+    <header>
+      <select id="meeting" title="Встреча"></select>
+      <button id="refresh" title="Обновить список">⟳</button>
+    </header>
+
+    <div class="bar">
+      <input id="search" type="search" placeholder="Поиск по встрече…" />
+      <span id="count" class="count"></span>
+    </div>
+
+    <div id="transcript" class="transcript"></div>
+
+    <footer>
+      <button id="copy">Копировать MD</button>
+      <button id="download">Скачать .md</button>
+      <button id="claude">→ Claude</button>
+      <button id="chatgpt">→ ChatGPT</button>
+      <button id="clear" class="danger">Очистить</button>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script type="module" src="sidepanel.js"></script>
+  </body>
+</html>
